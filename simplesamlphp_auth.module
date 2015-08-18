@@ -103,6 +103,11 @@ function simplesamlphp_auth_permission() {
       'title' => t('Administer simpleSAMLphp authentication'),
       'restrict access' => TRUE,
     ),
+    'change saml authentication setting' => array(
+      'title' => t('Change SAML authentication setting for individual accounts'),
+      'description' => t('Allow users to enable or disable SAML authentication per user on user edit forms.'),
+      'restrict access' => TRUE,
+    ),
   );
 }
 
@@ -282,7 +287,7 @@ function simplesamlphp_auth_form_alter(&$form, $form_state, $form_id) {
     $form['links']['#markup'] = $link;
   }
 
-  if ($form_id == 'user_register_form' || $form_id == 'user_profile_form') {
+  if (($form_id == 'user_register_form' || $form_id == 'user_profile_form') && user_access('change saml authentication setting')) {
     $form['saml'] = array(
       '#type' => 'checkbox',
       '#title' => t('Enable this user to leverage SAML authentication'),
