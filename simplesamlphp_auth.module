@@ -39,10 +39,37 @@ function simplesamlphp_auth_menu() {
     'title' => 'SimpleSAMLphp Auth Settings',
     'description' => 'Control the various settings of the simpleSAMLphp authentication module',
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('simplesamlphp_auth_settings'),
+    'page arguments' => array('simplesamlphp_auth_settings_basic'),
     'access arguments' => array('administer simpleSAMLphp authentication'),
     'file' => 'simplesamlphp_auth.admin.inc',
     'type' => MENU_LOCAL_TASK | MENU_NORMAL_ITEM,
+  );
+  $items['admin/config/people/simplesamlphp_auth/basic'] = array(
+    'title' => 'Basic settings',
+    'description' => 'Control the various settings of the simpleSAMLphp authentication module',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('simplesamlphp_auth_settings_basic'),
+    'access arguments' => array('administer simpleSAMLphp authentication'),
+    'file' => 'simplesamlphp_auth.admin.inc',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+  );
+  $items['admin/config/people/simplesamlphp_auth/sync'] = array(
+    'title' => 'User info and syncing',
+    'description' => 'Control the various settings of the simpleSAMLphp authentication module',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('simplesamlphp_auth_settings_sync'),
+    'access arguments' => array('administer simpleSAMLphp authentication'),
+    'file' => 'simplesamlphp_auth.admin.inc',
+    'type' => MENU_LOCAL_TASK,
+  );
+  $items['admin/config/people/simplesamlphp_auth/local'] = array(
+    'title' => 'Local authentication',
+    'description' => 'Configure local only authentication options',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('simplesamlphp_auth_settings_local'),
+    'access arguments' => array('administer simpleSAMLphp authentication'),
+    'file' => 'simplesamlphp_auth.admin.inc',
+    'type' => MENU_LOCAL_TASK,
   );
   $items[$login_path] = array(
     'title' => 'Logon to the site',

@@ -6,23 +6,16 @@
  */
 
 /**
- * Implements settings for the module.
+ * Basic configuration form.
+ *
+ * Shows the first page of SimpleSAMLphp Authentication's configuration.
+ *
+ * @return array
  */
-function simplesamlphp_auth_settings() {
-  global $_simplesamlphp_auth_saml_version, $base_url;
-
-  if (!empty($_simplesamlphp_auth_saml_version)) {
-    $ver = explode('.', $_simplesamlphp_auth_saml_version);
-    if (!($ver[0] >= 1 && $ver[1] >= 6)) {
-      drupal_set_message(t("Please upgrade SimpleSAMLphp. You are using %ssp_version", array('%ssp_version' => $_simplesamlphp_auth_saml_version)), 'warning');
-    }
-  }
-
-  $roles = user_roles(TRUE);
-
+function simplesamlphp_auth_settings_basic() {
   $form['simplesamlphp_auth_grp_setup'] = array(
     '#type' => 'fieldset',
-    '#title' => t('Basic Setup'),
+    '#title' => t('Basic settings'),
     '#collapsible' => FALSE,
   );
   $form['simplesamlphp_auth_grp_setup']['simplesamlphp_auth_activate'] = array(
@@ -56,6 +49,85 @@ function simplesamlphp_auth_settings() {
     '#description' => t('Path for logging into SAML - Do not include proceeding slash.'),
   );
 
+  $form['simplesamlphp_auth_grp_reg'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('User Provisioning'),
+    '#collapsible' => FALSE,
+    '#collapsed' => FALSE,
+  );
+  $form['simplesamlphp_auth_grp_reg']['simplesamlphp_auth_registerusers'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Register users (i.e., auto-provisioning)'),
+    '#default_value' => variable_get('simplesamlphp_auth_registerusers', TRUE),
+    '#description' => t("Determines wether or not the module should automatically create/register new Drupal accounts for users that authenticate using SimpleSAMLphp. Unless you've done some custom work to provision Drupal accounts with the necessary authmap entries you will want this checked. NOTE: If unchecked each user must already have been provisioned a Drupal account with an appropriate entry in the authmap table before logging in. Otherwise they will receive a notice and be denied access. Be aware that simply creating a Drupal account will not create the necessary entry in the authmap table."),
+  );
+
+  return system_settings_form($form);
+}
+
+/**
+ * Configuration form for all local authentication related settings.
+ *
+ * @return array
+ */
+function simplesamlphp_auth_settings_local() {
+  $roles = user_roles(TRUE);
+  $form['simplesamlphp_auth_grp_auth'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Drupal Authentication'),
+    '#collapsible' => FALSE,
+    '#collapsed' => FALSE,
+  );
+  $form['simplesamlphp_auth_grp_auth']['simplesamlphp_auth_allowdefaultlogin'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Allow authentication with local Drupal accounts'),
+    '#default_value' => variable_get('simplesamlphp_auth_allowdefaultlogin', TRUE),
+    '#description' => t('Check this box if you want to let people log in with local Drupal accounts (without using simpleSAMLphp). If you want to restrict this privilege to certain users you can enter the Drupal user IDs in the field below.'),
+  );
+  $form['simplesamlphp_auth_grp_auth']['simplesamlphp_auth_allowsetdrupalpwd'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Allow SAML users to set Drupal passwords.'),
+    '#default_value' => variable_get('simplesamlphp_auth_allowsetdrupalpwd', FALSE),
+    '#description' => t('Check this box if you want to let people set passwords for their local Drupal accounts. This will allow users to log in using either SAML or a local Drupal account. Disabling this removes the password change fields from the user profile form.<br/>NOTE: In order for them to login using their local Drupal password you must allow local logins with the settings below.'),
+    '#states' => array(
+      'enabled' => array(
+        ':input[name="simplesamlphp_auth_allowdefaultlogin"]' => array('checked' => TRUE),
+      ),
+    ),
+  );
+  $form['simplesamlphp_auth_grp_auth']['simplesamlphp_auth_allowdefaultloginroles'] = array(
+    '#type' => 'select',
+    '#size' => 3,
+    '#options' => $roles,
+    '#multiple' => TRUE,
+    '#title' => t('Which ROLES should be allowed to login with local accounts?'),
+    '#default_value' => variable_get('simplesamlphp_auth_allowdefaultloginroles', array()),
+    '#description' => t('Roles that should be allowed to login without simpleSAMLphp. Examples are dev/admin roles or guest roles.'),
+  );
+  $form['simplesamlphp_auth_grp_auth']['simplesamlphp_auth_allowdefaultloginusers'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Which users should be allowed to login with local accounts?'),
+    '#default_value' => variable_get('simplesamlphp_auth_allowdefaultloginusers', ''),
+    '#description' => t('Example: <i>1,2,3</i><br />A comma-separated list of user IDs that should be allowed to login without simpleSAMLphp. If left blank, all local accounts can login.'),
+  );
+  $form['simplesamlphp_auth_grp_auth']['simplesamlphp_auth_logoutgotourl'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Optionally, specify a URL for users to go to after logging out'),
+    '#default_value' => variable_get('simplesamlphp_auth_logoutgotourl', ''),
+    '#description' => t('Example: @base_url', array('@base_url' => $GLOBALS['base_url'])),
+  );
+
+  $form['#submit'][] = 'simplesamlphp_auth_settings_local_submit';
+
+  return system_settings_form($form);
+}
+
+/**
+ * Configuration form pertaining to how the data is pulled in from the IdP.
+ *
+ * @return array
+ */
+function simplesamlphp_auth_settings_sync() {
   $form['simplesamlphp_auth_grp_user'] = array(
     '#type' => 'fieldset',
     '#title' => t('User Info and Syncing'),
@@ -99,78 +171,18 @@ function simplesamlphp_auth_settings() {
     '#default_value' => variable_get('simplesamlphp_auth_autoenablesaml', 0),
   );
 
-  $form['simplesamlphp_auth_grp_reg'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('User Provisioning'),
-    '#collapsible' => TRUE,
-    '#collapsed' => TRUE,
-  );
-  $form['simplesamlphp_auth_grp_reg']['simplesamlphp_auth_registerusers'] = array(
-    '#type' => 'checkbox',
-    '#title' => t('Register users (i.e., auto-provisioning)'),
-    '#default_value' => variable_get('simplesamlphp_auth_registerusers', TRUE),
-    '#description' => t("Determines wether or not the module should automatically create/register new Drupal accounts for users that authenticate using SimpleSAMLphp. Unless you've done some custom work to provision Drupal accounts with the necessary authmap entries you will want this checked. NOTE: If unchecked each user must already have been provisioned a Drupal account with an appropriate entry in the authmap table before logging in. Otherwise they will receive a notice and be denied access. Be aware that simply creating a Drupal account will not create the necessary entry in the authmap table."),
-  );
-
-  $form['simplesamlphp_auth_grp_auth'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('Drupal Authentication'),
-    '#collapsible' => TRUE,
-    '#collapsed' => TRUE,
-  );
-  $form['simplesamlphp_auth_grp_auth']['simplesamlphp_auth_allowdefaultlogin'] = array(
-    '#type' => 'checkbox',
-    '#title' => t('Allow authentication with local Drupal accounts'),
-    '#default_value' => variable_get('simplesamlphp_auth_allowdefaultlogin', TRUE),
-    '#description' => t('Check this box if you want to let people log in with local Drupal accounts (without using simpleSAMLphp). If you want to restrict this privilege to certain users you can enter the Drupal user IDs in the field below.'),
-  );
-  $form['simplesamlphp_auth_grp_auth']['simplesamlphp_auth_allowsetdrupalpwd'] = array(
-    '#type' => 'checkbox',
-    '#title' => t('Allow SAML users to set Drupal passwords.'),
-    '#default_value' => variable_get('simplesamlphp_auth_allowsetdrupalpwd', FALSE),
-    '#description' => t('Check this box if you want to let people set passwords for their local Drupal accounts. This will allow users to log in using either SAML or a local Drupal account. Disabling this removes the password change fields from the user profile form.<br/>NOTE: In order for them to login using their local Drupal password you must allow local logins with the settings below.'),
-    '#states' => array(
-      'enabled' => array(
-        ':input[name="simplesamlphp_auth_allowdefaultlogin"]' => array('checked' => TRUE),
-      ),
-    ),
-  );
-  $form['simplesamlphp_auth_grp_auth']['simplesamlphp_auth_allowdefaultloginroles'] = array(
-    '#type' => 'select',
-    '#size' => 3,
-    '#options' => $roles,
-    '#multiple' => TRUE,
-    '#title' => t('Which ROLES should be allowed to login with local accounts?'),
-    '#default_value' => variable_get('simplesamlphp_auth_allowdefaultloginroles', array()),
-    '#description' => t('Roles that should be allowed to login without simpleSAMLphp. Examples are dev/admin roles or guest roles.'),
-  );
-  $form['simplesamlphp_auth_grp_auth']['simplesamlphp_auth_allowdefaultloginusers'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Which users should be allowed to login with local accounts?'),
-    '#default_value' => variable_get('simplesamlphp_auth_allowdefaultloginusers', ''),
-    '#description' => t('Example: <i>1,2,3</i><br />A comma-separated list of user IDs that should be allowed to login without simpleSAMLphp. If left blank, all local accounts can login.'),
-  );
-  $form['simplesamlphp_auth_grp_auth']['simplesamlphp_auth_logoutgotourl'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Optionally, specify a URL for users to go to after logging out'),
-    '#default_value' => variable_get('simplesamlphp_auth_logoutgotourl', ''),
-    '#description' => t('Example: @base_url', array('@base_url' => $base_url)),
-  );
-
-  $form['#submit'][] = 'simplesamlphp_auth_settings_submit';
-
   return system_settings_form($form);
 }
 
 /**
- * Additional submission handler for simplesamlphp_auth_settings().
+ * Additional submission handler for simplesamlphp_auth_settings_local().
  *
  * If there is a change in the login path, trigger a menu rebuild.
  *
- * @see simplesamlphp_auth_settings()
+ * @see simplesamlphp_auth_settings_local()
  * @see system_settings_form_submit()
  */
-function simplesamlphp_auth_settings_submit($form, &$form_state) {
+function simplesamlphp_auth_settings_local_submit($form, &$form_state) {
   $old_login_path = variable_get('simplesamlphp_auth_login_path', 'saml_login');
   $new_login_path = $form_state['values']['simplesamlphp_auth_login_path'];
 
