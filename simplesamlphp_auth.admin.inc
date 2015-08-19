@@ -48,7 +48,18 @@ function simplesamlphp_auth_settings_basic() {
     '#default_value' => variable_get('simplesamlphp_auth_login_path', 'saml_login'),
     '#description' => t('Path for logging into SAML - Do not include proceeding slash.'),
   );
-
+  $form['simplesamlphp_auth_grp_debug'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Debugging'),
+    '#collapsible' => FALSE,
+    '#collapsed' => FALSE,
+  );
+  $form['simplesamlphp_auth_grp_debug']['simplesamlphp_auth_debug'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Turn on debugging messages'),
+    '#default_value' => variable_get('simplesamlphp_auth_debug', FALSE),
+    '#description' => t('Expand the level of watchdog messages logged to include debugging information'),
+  );
   $form['simplesamlphp_auth_grp_reg'] = array(
     '#type' => 'fieldset',
     '#title' => t('User Provisioning'),
