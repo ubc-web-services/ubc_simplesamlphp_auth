@@ -274,6 +274,8 @@ function simplesamlphp_auth_form_alter(&$form, $form_state, $form_id) {
     return;
   }
 
+  $is_user_profile_account_form = (($form_id == 'user_profile_form') && ($form['#user_category'] == 'account'));
+
   $login_path = variable_get('simplesamlphp_auth_login_path', 'saml_login');
   $login_name = variable_get('simplesamlphp_auth_login_link_display_name', t('Federated Log In'));
   $link = l($login_name, $login_path);
@@ -289,7 +291,7 @@ function simplesamlphp_auth_form_alter(&$form, $form_state, $form_id) {
     $form['links']['#markup'] = $link;
   }
 
-  if (($form_id == 'user_register_form' || $form_id == 'user_profile_form') && user_access('change saml authentication setting')) {
+  if (($form_id == 'user_register_form' || $is_user_profile_account_form) && user_access('change saml authentication setting')) {
     $form['saml'] = array(
       '#type' => 'checkbox',
       '#title' => t('Enable this user to leverage SAML authentication'),
@@ -302,7 +304,7 @@ function simplesamlphp_auth_form_alter(&$form, $form_state, $form_id) {
   // them to know their Drupal password. This will allow them to change their
   // e-mail address, and set a Drupal password if they want to (and are
   // allowed).
-  if ((isset($form['#user']->init) && $form['#user']->init) && (_simplesaml_auth_user_has_authmap($form['#user']->init) && $form_id == 'user_profile_form')) {
+  if ($is_user_profile_account_form && (isset($form['#user']->init) && $form['#user']->init) && _simplesaml_auth_user_has_authmap($form['#user']->init)) {
 
     unset($form['account']['current_pass']);
     unset($form['account']['current_pass_required_values']);
