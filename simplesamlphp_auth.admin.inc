@@ -73,6 +73,8 @@ function simplesamlphp_auth_settings_basic() {
     '#description' => t("Determines wether or not the module should automatically create/register new Drupal accounts for users that authenticate using SimpleSAMLphp. Unless you've done some custom work to provision Drupal accounts with the necessary authmap entries you will want this checked. NOTE: If unchecked each user must already have been provisioned a Drupal account with an appropriate entry in the authmap table before logging in. Otherwise they will receive a notice and be denied access. Be aware that simply creating a Drupal account will not create the necessary entry in the authmap table."),
   );
 
+  $form['#submit'][] = 'simplesamlphp_auth_settings_basic_submit';
+
   return system_settings_form($form);
 }
 
@@ -127,8 +129,6 @@ function simplesamlphp_auth_settings_local() {
     '#default_value' => variable_get('simplesamlphp_auth_logoutgotourl', ''),
     '#description' => t('Example: @base_url', array('@base_url' => $GLOBALS['base_url'])),
   );
-
-  $form['#submit'][] = 'simplesamlphp_auth_settings_local_submit';
 
   return system_settings_form($form);
 }
@@ -186,14 +186,14 @@ function simplesamlphp_auth_settings_sync() {
 }
 
 /**
- * Additional submission handler for simplesamlphp_auth_settings_local().
+ * Additional submission handler for simplesamlphp_auth_settings_basic().
  *
  * If there is a change in the login path, trigger a menu rebuild.
  *
- * @see simplesamlphp_auth_settings_local()
+ * @see simplesamlphp_auth_settings_basic()
  * @see system_settings_form_submit()
  */
-function simplesamlphp_auth_settings_local_submit($form, &$form_state) {
+function simplesamlphp_auth_settings_basic_submit($form, &$form_state) {
   $old_login_path = variable_get('simplesamlphp_auth_login_path', 'saml_login');
   $new_login_path = $form_state['values']['simplesamlphp_auth_login_path'];
 
