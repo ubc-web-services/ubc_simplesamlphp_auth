@@ -304,7 +304,7 @@ function simplesamlphp_auth_form_alter(&$form, $form_state, $form_id) {
   // them to know their Drupal password. This will allow them to change their
   // e-mail address, and set a Drupal password if they want to (and are
   // allowed).
-  if ($is_user_profile_account_form && (isset($form['#user']->init) && $form['#user']->init) && _simplesaml_auth_user_has_authmap($form['#user']->init)) {
+  if ($is_user_profile_account_form && (isset($form['#user']->init) && $form['#user']->init) && _simplesaml_auth_user_has_authmap($form['#user']->name)) {
 
     unset($form['account']['current_pass']);
     unset($form['account']['current_pass_required_values']);
