@@ -125,12 +125,15 @@ function _simplesaml_auth_autoload() {
   global $_simplesamlphp_auth_saml_version;
 
   // Get the simplesamlphp session.
-  $basedir = variable_get('simplesamlphp_auth_installdir', '/usr/share/simplesamlphp');
-  if (file_exists($basedir . '/lib/_autoload.php')) {
-    require_once $basedir . '/lib/_autoload.php';
-  }
-  else {
-    return FALSE;
+  if (!class_exists('SimpleSAML_Configuration')) {
+    // Register SimpleSAMLphp autoloader (only if needed)
+    $basedir = variable_get('simplesamlphp_auth_installdir', '/usr/share/simplesamlphp');
+    if (file_exists($basedir . '/lib/_autoload.php')) {
+      require_once $basedir . '/lib/_autoload.php';
+    }
+    else {
+      return FALSE;
+    }
   }
 
   $_simplesamlphp_auth_saml_config = SimpleSAML_Configuration::getInstance();
