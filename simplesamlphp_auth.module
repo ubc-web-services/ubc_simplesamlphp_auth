@@ -84,6 +84,17 @@ function simplesamlphp_auth_menu() {
 }
 
 /**
+ * Implements hook_menu_site_status_alter().
+ */
+function simplesamlphp_auth_menu_site_status_alter(&$menu_site_status, $path) {
+  // Allow access to authenticate even if site is in offline mode.
+  $login_path = variable_get('simplesamlphp_auth_login_path', 'saml_login');
+  if ($menu_site_status == MENU_SITE_OFFLINE && user_is_anonymous() && $path == $login_path) {
+    $menu_site_status = MENU_SITE_ONLINE;
+  }
+}
+
+/**
  * Implements hook_help().
  */
 function simplesamlphp_auth_help($path, $arg) {
