@@ -17,6 +17,8 @@ function simplesamlphp_auth_install() {
   variable_set('user_register', 0);
   variable_set('simplesamlphp_auth_user_register_original', $original);
 
+  // Inform the user about disabling the open registration.
+  drupal_set_message(t('The SimpleSAMLphp Authentication module disabled the user registration. You can manually enable it again in the <a href="@user_settings_url">Account settings</a>.', array('@user_settings_url' => url('admin/config/people/accounts'))), 'warning');
 }
 
 /**
