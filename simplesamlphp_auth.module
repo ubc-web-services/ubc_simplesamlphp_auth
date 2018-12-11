@@ -401,11 +401,11 @@ function simplesamlphp_auth_block_view($delta = '') {
       else {
         if (!$_simplesamlphp_auth_as->isAuthenticated()) {
           $block['subject'] = t('CWL Logout Button with dynamic destination argument');
-          $block['content'] = t('not simplesaml authenticated');
+          $block['content'] = t('not ubc_simplesaml_auth authenticated');
         }
         else {
           $block['subject'] = t('CWL Logout Button with dynamic destination argument');
-          $block['content'] = t('simplesaml authenticated');
+          $block['content'] = t('ubc_simplesaml_auth authenticated');
         }
       }
     break;
