@@ -3,3 +3,5 @@ description = Allows users to authenticate to a remote SAML identity provider (I
 core = 7.x
 configure = admin/config/people/simplesamlphp_auth
 php = 5.3
+
+stylesheets[all][] = css/ubc_simplesamlphp_auth.css
