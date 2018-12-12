@@ -418,7 +418,7 @@ function simplesamlphp_auth_block_view($delta = '') {
  */
 function simplesamlphp_auth_block_info() {
   $blocks['original'] = array(
-    'info' => t('simpleSAMLphp authentication),
+    'info' => t('simpleSAMLphp authentication'),
     'cache' => DRUPAL_NO_CACHE,
   );
   $blocks['cwllogout'] = array(
