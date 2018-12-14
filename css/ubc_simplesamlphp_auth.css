@@ -13,13 +13,6 @@
     background-color: #002145;
     -webkit-transition: background-color .5s ease;
     transition: background-color .5s ease;
-    margin-left: 90%;
-
-  }
-  @media screen and (max-width: 1200px) {
-    .cwl-logout {
-      margin-left: unset !important;
-    }
   }
   
   .cwl-logout:hover {
