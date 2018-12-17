@@ -399,12 +399,12 @@ function simplesamlphp_auth_block_view($delta = '') {
         return;
       }
       else {
-        if (!$_simplesamlphp_auth_as->isAuthenticated()) {
+        if (!isset($_simplesamlphp_auth_as)) {
           $block['subject'] = t('CWL Button with dynamic destination argument');
           $destination = '?destination='.request_path();
           $block['content'] = '<div class="cwl-login"><a href="/saml_login'.$destination.'"><span>CWL</span> Login</a></div>';
         }
-        else {
+        else if ($_simplesamlphp_auth_as->isAuthenticated()){
           $block['subject'] = t('CWL Button with dynamic destination argument');
           $block['content'] = '<div class="cwl-logout"><a href="/user/logout"><span>CWL</span> Logout</a></div>';
         }
