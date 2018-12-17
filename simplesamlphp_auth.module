@@ -402,9 +402,14 @@ function simplesamlphp_auth_block_view($delta = '') {
         if (!isset($_simplesamlphp_auth_as)) {
           $block['subject'] = t('CWL Button with dynamic destination argument');
           $destination = '?destination='.request_path();
-          $block['content'] = '<div class="cwl-login"><a href="/saml_login'.$destination.'"><span>CWL</span> Login</a></div>';
+          $block['content'] = '<div class="cwl-login"><a href="/saml_login'.$destination.'"><span>CWL</span> Login Test 1</a></div>';
         }
-        else if ($_simplesamlphp_auth_as->isAuthenticated()){
+        else if (!$_simplesamlphp_auth_as->isAuthenticated()) {
+          $block['subject'] = t('CWL Button with dynamic destination argument');
+          $destination = '?destination='.request_path();
+          $block['content'] = '<div class="cwl-login"><a href="/saml_login'.$destination.'"><span>CWL</span> Login Test 2</a></div>';
+        }
+        else {
           $block['subject'] = t('CWL Button with dynamic destination argument');
           $block['content'] = '<div class="cwl-logout"><a href="/user/logout"><span>CWL</span> Logout</a></div>';
         }
